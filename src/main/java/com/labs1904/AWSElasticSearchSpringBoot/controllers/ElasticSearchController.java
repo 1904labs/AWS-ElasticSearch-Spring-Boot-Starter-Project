@@ -2,6 +2,7 @@ package com.labs1904.AWSElasticSearchSpringBoot.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.labs1904.AWSElasticSearchSpringBoot.models.Movie;
+import com.labs1904.AWSElasticSearchSpringBoot.models.MovieQuery;
 import com.labs1904.AWSElasticSearchSpringBoot.services.ElasticSearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,13 +22,14 @@ public class ElasticSearchController {
     /**
      * Get a Set of Movies that match your query criteria
      *
-     * @param query The query
+     * @param movieQuery The query
      * @return Set of Movies
      */
-    @GetMapping(value = "/get", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/get", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public Set<Movie> getFromElasticSearch(@RequestParam("query") final String query) {
-        return new HashSet<Movie>();
+    public ResponseEntity<String> getFromElasticSearch(@RequestBody final MovieQuery movieQuery) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                elasticSearchService.getMovies("movies",0, 100, null, movieQuery));
     }
 
     /**

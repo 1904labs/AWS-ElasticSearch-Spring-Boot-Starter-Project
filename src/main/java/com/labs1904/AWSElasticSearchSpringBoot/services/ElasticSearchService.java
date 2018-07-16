@@ -9,17 +9,20 @@ import com.amazonaws.http.HttpMethodName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.labs1904.AWSElasticSearchSpringBoot.config.ConfigurationInfo;
+import com.labs1904.AWSElasticSearchSpringBoot.constants.ElasticSearchConstants;
 import com.labs1904.AWSElasticSearchSpringBoot.handlers.AwsResponse;
 import com.labs1904.AWSElasticSearchSpringBoot.handlers.ElasticSearchClientHandler;
 import com.labs1904.AWSElasticSearchSpringBoot.models.Movie;
+import com.labs1904.AWSElasticSearchSpringBoot.models.MovieQuery;
+import com.labs1904.AWSElasticSearchSpringBoot.util.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Named
 public class ElasticSearchService {
@@ -91,7 +94,10 @@ public class ElasticSearchService {
         final ObjectMapper objectMapper = new ObjectMapper();
         final String json = objectMapper.writeValueAsString(movie);
         if (json != null) {
-            AwsResponse response = createDocument("movies", "movie", json, Long.toString(movie.getId()));
+            AwsResponse response = createDocument(ElasticSearchConstants.MOVIES_INDEX,
+                    ElasticSearchConstants.MOVIES_DOCUMENT_TYPE,
+                    json,
+                    Long.toString(movie.getId()));
             if (response != null && response.getHttpResponse().getStatusCode() >= 200
                     && response.getHttpResponse().getStatusCode() < 300) {
                 System.out.println("Successfully created new movie with ID: " + movie.getId() + " and title: " + movie.getTitle());
@@ -100,6 +106,95 @@ public class ElasticSearchService {
         }
 
         return null;
+    }
+
+    /**
+     *
+     * @param from Beginning point of the query
+     * @param size Number of objects to return in the query
+     * @param filterValues Optional list of values to filter the response by
+     * @return Response
+     */
+    public String getMovies(final String index, final int from, final int size, Set<String> filterValues, final MovieQuery movieQuery) {
+        JSONObject query = new JSONObject();
+        JSONObject bool = new JSONObject();
+        JSONObject must = new JSONObject();
+        JSONArray array = new JSONArray();
+
+        createMovieQuery(movieQuery, array);
+
+        query.put("from", from);
+        query.put("size", size);
+        must.put("must", array);
+        bool.put("bool", must);
+        query.put("query", bool);
+        if (filterValues != null) {
+            query.put("_source", filterValues);
+        }
+
+        final Map<String, List<String>> parameters = new HashMap<>();
+        parameters.put(ElasticSearchConstants.FILTER_PATH, Collections.singletonList(ElasticSearchConstants.FILTER));
+
+        final String url = index + ElasticSearchConstants.SEARCH_API;
+        System.out.println("ES Query Body: " + query.toString());
+        final Request request = generateSignedRequest(url, query.toString(), parameters, HttpMethodName.GET);
+
+        final AwsResponse response = executeRequest(request);
+
+        return response != null ? response.getBody() : "";
+    }
+
+    private void createMovieQuery(final MovieQuery movieQuery, JSONArray array) {
+        if(movieQuery.getId() > 0){
+            buildElasticSearchMatchStatement("id", movieQuery.getId(), array);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getTitle())){
+            buildElasticSearchMatchStatement("title", movieQuery.getTitle(), array);
+        }
+        if(movieQuery.getYear() > 0){
+            buildElasticSearchMatchStatement("year", movieQuery.getYear(), array);
+        }
+        if(movieQuery.getGenre() != null){
+            buildElasticSearchShouldStatement("genre", movieQuery.getGenre(), array);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getMpaaRating())){
+            buildElasticSearchMatchStatement("mpaaRating", movieQuery.getMpaaRating(), array);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getImdbUrl())){
+            buildElasticSearchMatchStatement("imdbUrl", movieQuery.getImdbUrl(), array);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getLanguage())){
+            buildElasticSearchMatchStatement("language", movieQuery.getLanguage(), array);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getCountry())){
+            buildElasticSearchMatchStatement("country", movieQuery.getCountry(), array);
+        }
+
+    }
+
+    private void buildElasticSearchShouldStatement(final String field, final Collection value,
+                                                   final JSONArray array) {
+        if (value.size() > 1) {
+            final JSONObject bool = new JSONObject();
+            final JSONObject should = new JSONObject();
+            final JSONArray match = new JSONArray();
+            for (Object objectValue : value) {
+                buildElasticSearchMatchStatement(field, objectValue, match);
+            }
+            should.put("should", match);
+            bool.put("bool", should);
+            array.put(bool);
+        } else {
+            buildElasticSearchMatchStatement(field, value.iterator().next(), array);
+        }
+    }
+
+    private void buildElasticSearchMatchStatement(final String field, final Object value, final JSONArray array) {
+        final JSONObject matchItem = new JSONObject();
+        final JSONObject matchTerms = new JSONObject();
+        matchTerms.put(field, value);
+        matchItem.put("match", matchTerms);
+        array.put(matchItem);
     }
 
 }
