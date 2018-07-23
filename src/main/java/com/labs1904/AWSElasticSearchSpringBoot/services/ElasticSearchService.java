@@ -144,6 +144,41 @@ public class ElasticSearchService {
         return response != null ? response.getBody() : "";
     }
 
+    /**
+     * Build a fuzzy search ElasticSearch query
+     *
+     * @param from Beginning point of the query
+     * @param size Number of objects to return in the query
+     * @param filterValues Optional list of values to filter the response by
+     * @return Response
+     */
+    public String getMoviesFuzzySearch(final String index, final int from, final int size, Set<String> filterValues, final MovieQuery movieQuery) {
+        JSONObject query = new JSONObject();
+        JSONObject fuzzy = new JSONObject();
+        JSONObject searchTerm = new JSONObject();
+
+        createMovieQueryFuzzySearch(movieQuery, searchTerm);
+
+        query.put("from", from);
+        query.put("size", size);
+        fuzzy.put("fuzzy", searchTerm);
+        query.put("query", fuzzy);
+        if (filterValues != null) {
+            query.put("_source", filterValues);
+        }
+
+        final Map<String, List<String>> parameters = new HashMap<>();
+        parameters.put(ElasticSearchConstants.FILTER_PATH, Collections.singletonList(ElasticSearchConstants.FILTER));
+
+        final String url = index + ElasticSearchConstants.SEARCH_API;
+        System.out.println("ES Query Body: " + query.toString());
+        final Request request = generateSignedRequest(url, query.toString(), parameters, HttpMethodName.GET);
+
+        final AwsResponse response = executeRequest(request);
+
+        return response != null ? response.getBody() : "";
+    }
+
     private void createMovieQuery(final MovieQuery movieQuery, JSONArray array) {
         if(movieQuery.getId() > 0){
             buildElasticSearchMatchStatement("id", movieQuery.getId(), array);
@@ -168,6 +203,21 @@ public class ElasticSearchService {
         }
         if(StringUtils.checkNullOrEmpty(movieQuery.getCountry())){
             buildElasticSearchMatchStatement("country", movieQuery.getCountry(), array);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getStoryline())){
+            buildElasticSearchMatchStatement("storyline", movieQuery.getStoryline(), array);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getSynopsis())){
+            buildElasticSearchMatchStatement("synopsis", movieQuery.getSynopsis(), array);
+        }
+    }
+
+    private void createMovieQueryFuzzySearch(final MovieQuery movieQuery, JSONObject searchTerm) {
+        if(StringUtils.checkNullOrEmpty(movieQuery.getStoryline())){
+            buildElasticSearchFuzzyStatement("storyline", movieQuery.getStoryline(), searchTerm);
+        }
+        if(StringUtils.checkNullOrEmpty(movieQuery.getSynopsis())){
+            buildElasticSearchFuzzyStatement("synopsis", movieQuery.getSynopsis(), searchTerm);
         }
 
     }
@@ -195,6 +245,16 @@ public class ElasticSearchService {
         matchTerms.put(field, value);
         matchItem.put("match", matchTerms);
         array.put(matchItem);
+    }
+
+    private void buildElasticSearchFuzzyStatement(final String field, final Object value, final JSONObject searchTerm) {
+        final JSONObject fuzzyBlock = new JSONObject();
+        fuzzyBlock.put("value", value);
+        fuzzyBlock.put("boost", 1.0);
+        fuzzyBlock.put("fuzziness", 50);
+        fuzzyBlock.put("prefix_length", 0);
+        fuzzyBlock.put("max_expansions", 100);
+        searchTerm.put(field, fuzzyBlock);
     }
 
 }

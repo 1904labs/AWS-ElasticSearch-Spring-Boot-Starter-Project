@@ -25,11 +25,24 @@ public class ElasticSearchController {
      * @param movieQuery The query
      * @return Set of Movies
      */
-    @PostMapping(value = "/get", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/search", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public ResponseEntity<String> getFromElasticSearch(@RequestBody final MovieQuery movieQuery) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 elasticSearchService.getMovies("movies",0, 100, null, movieQuery));
+    }
+
+    /**
+     * Fuzzy search the Movies index with a partial word, or one word in a sentence.
+     *
+     * @param movieQuery The query
+     * @return Set of Movies
+     */
+    @PostMapping(value = "/fuzzySearch", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public ResponseEntity<String> getFromElasticSearchFuzzySearch(@RequestBody final MovieQuery movieQuery) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                elasticSearchService.getMoviesFuzzySearch("movies",0, 100, null, movieQuery));
     }
 
     /**

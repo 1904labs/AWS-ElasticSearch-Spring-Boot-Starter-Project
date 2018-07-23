@@ -29,7 +29,7 @@ public class ElasticSearchClientHandler extends AmazonWebServiceClient {
         this.responseHandler = SdkStructuredPlainJsonFactory.SDK_JSON_FACTORY.createResponseHandler(metadata, responseUnmarshaller);
         JsonErrorUnmarshaller defaultErrorUnmarshaller = new JsonErrorUnmarshaller(AmazonServiceException.class, null) {
             @Override
-            public AmazonServiceException unmarshall(JsonNode json) throws Exception {
+            public AmazonServiceException unmarshall(JsonNode json) {
                 return new AmazonServiceException(json.asText());
             }
         };
