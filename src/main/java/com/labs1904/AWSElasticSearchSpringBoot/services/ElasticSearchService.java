@@ -90,6 +90,13 @@ public class ElasticSearchService {
         return executeRequest(request);
     }
 
+    public AwsResponse deleteDocument(final String index, final String type, final String id){
+        final String url = index + "/" + type + "/" + id;
+        final Request request = generateSignedRequest(url, null, null, HttpMethodName.DELETE);
+
+        return executeRequest(request);
+    }
+
     public String createNewMovie(Movie movie) throws JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final String json = objectMapper.writeValueAsString(movie);
@@ -98,8 +105,7 @@ public class ElasticSearchService {
                     ElasticSearchConstants.MOVIES_DOCUMENT_TYPE,
                     json,
                     Long.toString(movie.getId()));
-            if (response != null && response.getHttpResponse().getStatusCode() >= 200
-                    && response.getHttpResponse().getStatusCode() < 300) {
+            if (response != null && response.getHttpResponse().getStatusCode() == 201) {
                 System.out.println("Successfully created new movie with ID: " + movie.getId() + " and title: " + movie.getTitle());
                 return movie.getTitle();
             }
