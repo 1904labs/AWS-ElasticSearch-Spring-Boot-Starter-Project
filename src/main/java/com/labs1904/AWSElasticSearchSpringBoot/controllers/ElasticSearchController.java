@@ -1,6 +1,7 @@
 package com.labs1904.AWSElasticSearchSpringBoot.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.labs1904.AWSElasticSearchSpringBoot.handlers.AwsResponse;
 import com.labs1904.AWSElasticSearchSpringBoot.models.Movie;
 import com.labs1904.AWSElasticSearchSpringBoot.models.MovieQuery;
 import com.labs1904.AWSElasticSearchSpringBoot.services.ElasticSearchService;
@@ -29,7 +30,7 @@ public class ElasticSearchController {
     @ResponseBody
     public ResponseEntity<String> getFromElasticSearch(@RequestBody final MovieQuery movieQuery) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                elasticSearchService.getMovies("movies",0, 100, null, movieQuery));
+                elasticSearchService.getMovies("movies", 0, 100, null, movieQuery));
     }
 
     /**
@@ -42,7 +43,7 @@ public class ElasticSearchController {
     @ResponseBody
     public ResponseEntity<String> getFromElasticSearchFuzzySearch(@RequestBody final MovieQuery movieQuery) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                elasticSearchService.getMoviesFuzzySearch("movies",0, 100, null, movieQuery));
+                elasticSearchService.getMoviesFuzzySearch("movies", 0, 100, null, movieQuery));
     }
 
     /**
@@ -81,12 +82,21 @@ public class ElasticSearchController {
     /**
      * Delete a Movie object in ElasticSearch
      *
-     * @param id The Movie ID
+     * @param index The targeted index
+     * @param type  The document type
+     * @param id    The document ID
      * @return Response Entity
      */
     @DeleteMapping(value = "/delete", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public ResponseEntity<String> deleteFromElasticSearch(@RequestParam("query") final String id) {
-        return ResponseEntity.status(HttpStatus.OK).body("Success");
+    public ResponseEntity<String> deleteFromElasticSearch(@RequestParam("index") final String index,
+                                                          @RequestParam("type") final String type,
+                                                          @RequestParam("id") final String id) {
+        AwsResponse response = elasticSearchService.deleteDocument(index, type, id);
+        if (response != null && response.getHttpResponse().getStatusCode() == 200) {
+            return ResponseEntity.status(HttpStatus.OK).body(String.valueOf(response.getHttpResponse().getStatusCode()));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting ElasticSearch document");
+        }
     }
 }
