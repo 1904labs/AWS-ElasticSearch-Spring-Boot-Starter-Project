@@ -27,12 +27,12 @@ This project was made to help developers use Amazon's ElasticSearch through the 
 In order to fully see a working project, you will need an ES instance from AWS. Amazon offers a free tier of ES, which is enough to get started with this project. Create a free account here: https://aws.amazon.com/elasticsearch-service/
 
 Once you have an account, download this project and fill out the `application.properties` file with the appropriate values for these fields:
-  ```
+```
   aws.region=your_region_here // Example: us-east-1
   aws.endpoint=your_endpoint_here // Example: https://aws-es-instance-url.es.amazonaws.com/
 ```
 ### Credentials
-In order to authenticate AWS ES calls, you must have a valid user account provide the following keys:
+In order to authenticate AWS ES calls, you must have a valid user account and provide the following keys:
  - `aws_access_key_id`
  - `aws_secret_access_key`
 
@@ -40,13 +40,30 @@ Create user accounts and groups through the `IAM` dashboard in AWS. Under the _S
 
 **Important Note: Your `aws_secret_access_key` is only shown to you ONCE when you create a user through the IAM dashboard. Keep this key safe and secured. You will not be able to retrieve it again.**
 
-AWS provides 4 ways to provide these credentials to the project through its `DefaultAWSCredentialsProviderChain()` method. This is called automatically for you when you start your project. If no credentials are found, your build will fail and you will get an error message. Here are the 4 places you can place your credentials in:
+There are 4 ways to provide these credentials to the project through its `DefaultAWSCredentialsProviderChain()` method. This is called automatically for you when you start your project. If no credentials are found, your build will fail and you will get an error message. Here are the 4 places you can place your credentials in:
 1. Environment Variables
 2. System properties
 3. Profile Credentials Provider
 4. EC2 Container Credentials Provider
 
+**Profile Credentials Provider:** This is the simplest way to get started with the project. For `Mac` users, open a terminal window and do the following:
+```
+$> cd /Users/_your_profile_here_
+$> mkdir .aws
+$> cd .aws
+$> touch credentials
+```
+Open the newly created `credentials` file with your favorite editor and paste the following:
+```
+[default]
+aws_access_key_id=_your_key_id_here
+aws_secret_access_key=_your_secret_key_here
+```
+Enter your key values, save and close. You're done. =)
 
+**Notice: The _credentials_ file must NOT have a file extension.**
+
+`Windows` users, place the `Credentials` file in: `C:\Users\_your_user_profile`
 
 ## Configuration
 Testing of this application was done with the latest version of ElasticSearch available on AWS (6.2), however this project should work with all versions at least 5.0 or greater.
