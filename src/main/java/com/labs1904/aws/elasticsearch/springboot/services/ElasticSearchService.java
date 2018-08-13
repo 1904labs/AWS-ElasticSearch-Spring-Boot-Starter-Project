@@ -29,7 +29,7 @@ import java.util.*;
 @Named
 public class ElasticSearchService {
 
-    private Logger LOGGER = LoggerFactory.getLogger(ElasticSearchService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchService.class);
 
     private static final AWSCredentials AWS_CREDENTIALS = new DefaultAWSCredentialsProviderChain().getCredentials();
 

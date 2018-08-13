@@ -39,7 +39,7 @@ theDocTypeMapping = "movie"
 if es.indices.exists(theIndex):
     es.indices.delete(index=theIndex)
     if not es.indices.exists(theIndex):
-        print "Successfully deleted", '"{}"'.format(theIndex), "index"
+        print("Successfully deleted {} index".format(theIndex))
 
 
 # Create the Index
@@ -50,12 +50,12 @@ es.indices.create(index=theIndex)
 # Check that the Index was successfully created
 
 if es.indices.exists(theIndex):
-    print "Successfully created", '"{}"'.format(theIndex), "index"
+    print("Successfully created {} index".format(theIndex))
 
 
 # Put the mapping for the ElasticSearch Index
 
-print "Starting request to put Index Document Mapping"
+print("Starting request to put Index Document Mapping")
 es.indices.put_mapping(
     index = theIndex,
     doc_type = theDocTypeMapping,
@@ -76,10 +76,10 @@ es.indices.put_mapping(
         }
     }
 )
-print "Finished request to put Index Document Mapping"
+print("Finished request to put Index Document Mapping")
 
 
 # Verify that the Index was created
 
 if es.indices.exists(theIndex):
-    print "Successfully created", '"{}"'.format(theIndex), "index, with document mapping", '"{}"'.format(theDocTypeMapping)
+    print("Successfully created {} index, with document mapping {}".format(theIndex, theDocTypeMapping))
