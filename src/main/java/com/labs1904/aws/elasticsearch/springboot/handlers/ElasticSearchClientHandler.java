@@ -1,4 +1,4 @@
-package com.labs1904.AWSElasticSearchSpringBoot.handlers;
+package com.labs1904.aws.elasticsearch.springboot.handlers;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonWebServiceClient;

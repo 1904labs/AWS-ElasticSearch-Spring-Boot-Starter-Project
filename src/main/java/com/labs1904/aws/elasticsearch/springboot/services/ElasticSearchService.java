@@ -1,4 +1,4 @@
-package com.labs1904.AWSElasticSearchSpringBoot.services;
+package com.labs1904.aws.elasticsearch.springboot.services;
 
 import com.amazonaws.*;
 import com.amazonaws.auth.AWS4Signer;
@@ -8,15 +8,17 @@ import com.amazonaws.http.ExecutionContext;
 import com.amazonaws.http.HttpMethodName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.labs1904.AWSElasticSearchSpringBoot.config.ConfigurationInfo;
-import com.labs1904.AWSElasticSearchSpringBoot.constants.ElasticSearchConstants;
-import com.labs1904.AWSElasticSearchSpringBoot.handlers.AwsResponse;
-import com.labs1904.AWSElasticSearchSpringBoot.handlers.ElasticSearchClientHandler;
-import com.labs1904.AWSElasticSearchSpringBoot.models.Movie;
-import com.labs1904.AWSElasticSearchSpringBoot.models.MovieQuery;
-import com.labs1904.AWSElasticSearchSpringBoot.util.StringUtils;
+import com.labs1904.aws.elasticsearch.springboot.config.ConfigurationInfo;
+import com.labs1904.aws.elasticsearch.springboot.constants.ElasticSearchConstants;
+import com.labs1904.aws.elasticsearch.springboot.handlers.AwsResponse;
+import com.labs1904.aws.elasticsearch.springboot.handlers.ElasticSearchClientHandler;
+import com.labs1904.aws.elasticsearch.springboot.models.Movie;
+import com.labs1904.aws.elasticsearch.springboot.models.MovieQuery;
+import com.labs1904.aws.elasticsearch.springboot.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,6 +28,8 @@ import java.util.*;
 
 @Named
 public class ElasticSearchService {
+
+    private Logger LOGGER = LoggerFactory.getLogger(ElasticSearchService.class);
 
     private static final AWSCredentials AWS_CREDENTIALS = new DefaultAWSCredentialsProviderChain().getCredentials();
 
@@ -42,7 +46,7 @@ public class ElasticSearchService {
         aws4Signer.sign(request, AWS_CREDENTIALS);
     }
 
-    public Request generateSignedRequest(final String url,
+    private Request generateSignedRequest(final String url,
                                          final String json,
                                          final Map<String, List<String>> parameters,
                                          final HttpMethodName httpMethodName) {
@@ -78,7 +82,7 @@ public class ElasticSearchService {
 
             return client.execute(context, request);
         } catch (Exception e) {
-            System.out.println("Error executing ElasticSearch Request." + e);
+            LOGGER.error("Error executing ElasticSearch Request.", e);
         }
         return null;
     }
@@ -92,6 +96,7 @@ public class ElasticSearchService {
 
     public AwsResponse deleteDocument(final String index, final String type, final String id){
         final String url = index + "/" + type + "/" + id;
+        // JSON and URL Parameters are not needed when deleting documents from ElasticSearch
         final Request request = generateSignedRequest(url, null, null, HttpMethodName.DELETE);
 
         return executeRequest(request);
@@ -106,7 +111,7 @@ public class ElasticSearchService {
                     json,
                     Long.toString(movie.getId()));
             if (response != null && response.getHttpResponse().getStatusCode() == 201) {
-                System.out.println("Successfully created new movie with ID: " + movie.getId() + " and title: " + movie.getTitle());
+                LOGGER.info("Successfully created new movie with ID: {} and title: {}", movie.getId(), movie.getTitle());
                 return movie.getTitle();
             }
         }
@@ -142,7 +147,7 @@ public class ElasticSearchService {
         parameters.put(ElasticSearchConstants.FILTER_PATH, Collections.singletonList(ElasticSearchConstants.FILTER));
 
         final String url = index + ElasticSearchConstants.SEARCH_API;
-        System.out.println("ES Query Body: " + query.toString());
+        LOGGER.info("ES Query Body: {}", query);
         final Request request = generateSignedRequest(url, query.toString(), parameters, HttpMethodName.GET);
 
         final AwsResponse response = executeRequest(request);
@@ -177,7 +182,7 @@ public class ElasticSearchService {
         parameters.put(ElasticSearchConstants.FILTER_PATH, Collections.singletonList(ElasticSearchConstants.FILTER));
 
         final String url = index + ElasticSearchConstants.SEARCH_API;
-        System.out.println("ES Query Body: " + query.toString());
+        LOGGER.info("ES Query Body: {}", query);
         final Request request = generateSignedRequest(url, query.toString(), parameters, HttpMethodName.GET);
 
         final AwsResponse response = executeRequest(request);

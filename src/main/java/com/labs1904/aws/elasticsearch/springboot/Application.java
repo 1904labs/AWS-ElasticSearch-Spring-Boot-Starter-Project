@@ -1,4 +1,4 @@
-package com.labs1904.AWSElasticSearchSpringBoot;
+package com.labs1904.aws.elasticsearch.springboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

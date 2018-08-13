@@ -1,4 +1,4 @@
-package com.labs1904.AWSElasticSearchSpringBoot.config;
+package com.labs1904.aws.elasticsearch.springboot.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

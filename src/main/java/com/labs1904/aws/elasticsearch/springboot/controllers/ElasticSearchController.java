@@ -1,18 +1,16 @@
-package com.labs1904.AWSElasticSearchSpringBoot.controllers;
+package com.labs1904.aws.elasticsearch.springboot.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.labs1904.AWSElasticSearchSpringBoot.handlers.AwsResponse;
-import com.labs1904.AWSElasticSearchSpringBoot.models.Movie;
-import com.labs1904.AWSElasticSearchSpringBoot.models.MovieQuery;
-import com.labs1904.AWSElasticSearchSpringBoot.services.ElasticSearchService;
+import com.labs1904.aws.elasticsearch.springboot.handlers.AwsResponse;
+import com.labs1904.aws.elasticsearch.springboot.models.Movie;
+import com.labs1904.aws.elasticsearch.springboot.models.MovieQuery;
+import com.labs1904.aws.elasticsearch.springboot.services.ElasticSearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/elastic-search")

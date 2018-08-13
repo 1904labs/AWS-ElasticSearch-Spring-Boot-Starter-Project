@@ -1,4 +1,4 @@
-package com.labs1904.AWSElasticSearchSpringBoot.constants;
+package com.labs1904.aws.elasticsearch.springboot.constants;
 
 public class ElasticSearchConstants {
     private ElasticSearchConstants() throws IllegalAccessException {

@@ -1,4 +1,4 @@
-package com.labs1904.AWSElasticSearchSpringBoot.models;
+package com.labs1904.aws.elasticsearch.springboot.models;
 
 import java.util.Set;
 
