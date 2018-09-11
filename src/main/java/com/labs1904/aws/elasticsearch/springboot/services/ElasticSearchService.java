@@ -36,6 +36,11 @@ public class ElasticSearchService {
     @Inject
     private ConfigurationInfo configurationInfo;
 
+    /**
+     * Sign the request to AWS ElasticSearch using the AWS4Signer
+     *
+     * @param request The Request
+     */
     private void signRequest(Request request) {
         final String region = configurationInfo.getRegion();
         final String serviceName = configurationInfo.getServiceName();
@@ -46,6 +51,16 @@ public class ElasticSearchService {
         aws4Signer.sign(request, AWS_CREDENTIALS);
     }
 
+    /**
+     *  Build the full URL, create request headers, and build Request object prior to signing the Request to send
+     *  to AWS ElasticSearch
+     *
+     * @param url The URL
+     * @param json The request body
+     * @param parameters The request parameters
+     * @param httpMethodName The HTTPMethodName
+     * @return The Request
+     */
     private Request generateSignedRequest(final String url,
                                          final String json,
                                          final Map<String, List<String>> parameters,
@@ -74,6 +89,12 @@ public class ElasticSearchService {
         return request;
     }
 
+    /**
+     * Submit the Request to AWS, and return the response
+     *
+     * @param request The Request
+     * @return AwsResponse
+     */
     private AwsResponse executeRequest(Request request) {
         try {
             final ClientConfiguration configuration = new ClientConfiguration();
@@ -87,6 +108,15 @@ public class ElasticSearchService {
         return null;
     }
 
+    /**
+     * Create a new document in ElasticSearch with a given Index, Document Mapping, Document Body, and Document ID
+     *
+     * @param index The index to create the new document in
+     * @param type The mapping used by the index
+     * @param json The document
+     * @param id The document ID
+     * @return AwsResponse
+     */
     private AwsResponse createDocument(final String index, final String type, final String json, final String id) {
         final String url = index + "/" + type + "/" + id;
         final Request request = generateSignedRequest(url, json, null, HttpMethodName.PUT);
@@ -94,6 +124,14 @@ public class ElasticSearchService {
         return executeRequest(request);
     }
 
+    /**
+     * Delete a document from ElasticSearch with a given Index, Document Mapping, and Document ID
+     *
+     * @param index The index to delete the document from
+     * @param type The mapping use by the index
+     * @param id The ID of the document to be deleted
+     * @return AwsResponse
+     */
     public AwsResponse deleteDocument(final String index, final String type, final String id){
         final String url = index + "/" + type + "/" + id;
         // JSON and URL Parameters are not needed when deleting documents from ElasticSearch
@@ -102,6 +140,13 @@ public class ElasticSearchService {
         return executeRequest(request);
     }
 
+    /**
+     * Create the Movie in ElasticSearch
+     *
+     * @param movie The Movie
+     * @return The response string
+     * @throws JsonProcessingException Throws JsonProcessingException when response cannot be parsed
+     */
     public String createNewMovie(Movie movie) throws JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final String json = objectMapper.writeValueAsString(movie);
@@ -120,6 +165,7 @@ public class ElasticSearchService {
     }
 
     /**
+     * Generate the request from the API criteria, and return the results from ElasticSearch
      *
      * @param from Beginning point of the query
      * @param size Number of objects to return in the query
@@ -190,6 +236,12 @@ public class ElasticSearchService {
         return response != null ? response.getBody() : "";
     }
 
+    /**
+     * Build a query statement from the MovieQuery object
+     *
+     * @param movieQuery The MovieQuery
+     * @param array The JSONArray
+     */
     private void createMovieQuery(final MovieQuery movieQuery, JSONArray array) {
         if(movieQuery.getId() > 0){
             buildElasticSearchMatchStatement("id", movieQuery.getId(), array);
@@ -223,6 +275,12 @@ public class ElasticSearchService {
         }
     }
 
+    /**
+     * Build an ElasticSearch fuzzy search statement.
+     *
+     * @param movieQuery The MovieQuery
+     * @param searchTerm The term to search for
+     */
     private void createMovieQueryFuzzySearch(final MovieQuery movieQuery, JSONObject searchTerm) {
         if(StringUtils.checkNullOrEmpty(movieQuery.getStoryline())){
             buildElasticSearchFuzzyStatement("storyline", movieQuery.getStoryline(), searchTerm);
@@ -233,6 +291,13 @@ public class ElasticSearchService {
 
     }
 
+    /**
+     * Build an ElasticSearch 'should' statement.
+     *
+     * @param field The field to search in
+     * @param value The value to search for
+     * @param array The JSONArray to append the the query to
+     */
     private void buildElasticSearchShouldStatement(final String field, final Collection value,
                                                    final JSONArray array) {
         if (value.size() > 1) {
@@ -250,6 +315,13 @@ public class ElasticSearchService {
         }
     }
 
+    /**
+     * Build an ElasticSearch 'match' statement. This is equivalent to a SQL 'equals' statement.
+     *
+     * @param field The field to search in
+     * @param value The value to search for
+     * @param array The JSONArray to append the query to
+     */
     private void buildElasticSearchMatchStatement(final String field, final Object value, final JSONArray array) {
         final JSONObject matchItem = new JSONObject();
         final JSONObject matchTerms = new JSONObject();
@@ -258,6 +330,13 @@ public class ElasticSearchService {
         array.put(matchItem);
     }
 
+    /**
+     * Build a fuzzy search clause
+     *
+     * @param field The field to search in
+     * @param value The partial value to search for
+     * @param searchTerm The JSONObject
+     */
     private void buildElasticSearchFuzzyStatement(final String field, final Object value, final JSONObject searchTerm) {
         final JSONObject fuzzyBlock = new JSONObject();
         fuzzyBlock.put("value", value);
@@ -266,6 +345,22 @@ public class ElasticSearchService {
         fuzzyBlock.put("prefix_length", 0);
         fuzzyBlock.put("max_expansions", 100);
         searchTerm.put(field, fuzzyBlock);
+    }
+
+    /**
+     * Build request to /_stats API in ElasticSearch
+     *
+     * @param index The Index
+     * @return Response
+     */
+    public String getIndexStatistics(final String index) {
+        final String url = index + ElasticSearchConstants.STATS_API;
+
+        final Request request = generateSignedRequest(url, null, null, HttpMethodName.GET);
+
+        final AwsResponse response = executeRequest(request);
+
+        return response != null ? response.getBody() : "";
     }
 
 }

@@ -5,6 +5,8 @@ import com.labs1904.aws.elasticsearch.springboot.handlers.AwsResponse;
 import com.labs1904.aws.elasticsearch.springboot.models.Movie;
 import com.labs1904.aws.elasticsearch.springboot.models.MovieQuery;
 import com.labs1904.aws.elasticsearch.springboot.services.ElasticSearchService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ import javax.inject.Inject;
 @RestController
 @RequestMapping("/elastic-search")
 public class ElasticSearchController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchController.class);
+
     @Inject
     private ElasticSearchService elasticSearchService;
 
@@ -60,7 +65,7 @@ public class ElasticSearchController {
                 return ResponseEntity.status(HttpStatus.OK).body("Successfully created " + title);
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to create Movie.", e);
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create  " + title);
     }
@@ -95,6 +100,23 @@ public class ElasticSearchController {
             return ResponseEntity.status(HttpStatus.OK).body(String.valueOf(response.getHttpResponse().getStatusCode()));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting ElasticSearch document");
+        }
+    }
+
+    /**
+     * Get statistics about an ElasticSearch Index
+     *
+     * @param index The targeted index
+     * @return Response Entity
+     */
+    @GetMapping(value = "/statistics", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public ResponseEntity<String> indexStatistics(@RequestParam("index") final String index) {
+        String response = elasticSearchService.getIndexStatistics(index);
+        if (response != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching statistics for index");
         }
     }
 }

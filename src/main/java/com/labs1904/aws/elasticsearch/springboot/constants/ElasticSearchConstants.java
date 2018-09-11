@@ -11,5 +11,6 @@ public class ElasticSearchConstants {
     public static final String FILTER_PATH = "filter_path";
     public static final String FILTER = "hits.hits._source";
     public static final String SEARCH_API = "/_search";
+    public static final String STATS_API = "/_stats";
 
 }
