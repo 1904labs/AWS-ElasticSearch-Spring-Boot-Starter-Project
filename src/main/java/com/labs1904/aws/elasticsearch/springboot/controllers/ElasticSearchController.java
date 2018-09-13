@@ -55,7 +55,7 @@ public class ElasticSearchController {
      * @param movie The Movie object
      * @return Response Entity
      */
-    @PostMapping(value = "/create", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/create", produces = {MediaType.TEXT_PLAIN_VALUE})
     @ResponseBody
     public ResponseEntity<String> createElasticSearchObject(@RequestBody final Movie movie) {
         String title = null;
@@ -76,10 +76,21 @@ public class ElasticSearchController {
      * @param movie The Movie object
      * @return Response Entity
      */
-    @PutMapping(value = "/update", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PutMapping(value = "/update", produces = {MediaType.TEXT_PLAIN_VALUE})
     @ResponseBody
     public ResponseEntity<String> updateElasticSearchObject(@RequestBody final Movie movie) {
-        return ResponseEntity.status(HttpStatus.OK).body("Success");
+        String title = null;
+        try {
+            // For simplicity, since ElasticSearch fully overwrites the document, we will create a new document from the request
+            // and push to ElasticSearch which will overwrite the existing document
+            title = elasticSearchService.createNewMovie(movie);
+            if (title != null) {
+                return ResponseEntity.status(HttpStatus.OK).body("Successfully updated " + title);
+            }
+        } catch (JsonProcessingException e) {
+            LOGGER.error("Failed to update Movie.", e);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update  " + title);
     }
 
     /**
@@ -90,7 +101,7 @@ public class ElasticSearchController {
      * @param id    The document ID
      * @return Response Entity
      */
-    @DeleteMapping(value = "/delete", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @DeleteMapping(value = "/delete", produces = {MediaType.TEXT_PLAIN_VALUE})
     @ResponseBody
     public ResponseEntity<String> deleteFromElasticSearch(@RequestParam("index") final String index,
                                                           @RequestParam("type") final String type,

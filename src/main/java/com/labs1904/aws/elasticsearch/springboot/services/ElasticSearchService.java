@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -155,7 +156,7 @@ public class ElasticSearchService {
                     ElasticSearchConstants.MOVIES_DOCUMENT_TYPE,
                     json,
                     Long.toString(movie.getId()));
-            if (response != null && response.getHttpResponse().getStatusCode() == 201) {
+            if (response != null && response.getHttpResponse().getStatusCode() == HttpStatus.OK.value()) {
                 LOGGER.info("Successfully created new movie with ID: {} and title: {}", movie.getId(), movie.getTitle());
                 return movie.getTitle();
             }

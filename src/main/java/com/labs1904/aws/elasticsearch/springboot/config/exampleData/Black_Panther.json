@@ -1,0 +1,89 @@
+{
+  "id": 1,
+  "title": "Black Panther",
+  "year": 2018,
+  "genre": [
+    "Action",
+    "Adventure"
+  ],
+  "storyline": "King T'Challa returns home from America to the reclusive, technologically advanced African nation of Wakanda to serv as his country's new leader.",
+  "synopsis": "Centuries ago, as five African tribes war over a meteorite made up of the alien metal vibranium, a warrior ingests a heart-shaped herb affected by the metal and gains superhuman abilities. Becoming the first Black Panther, he unites four of the five tribes and forms the nation of Wakanda. As time passes, the Wakandans use the vibranium to develop highly-advanced technology while simultaneously isolating themselves from the rest of the world and posing as a third world country.",
+  "mpaaRating": "R",
+  "starRating": 7.5,
+  "duration": 134,
+  "imdbUrl": "https://www.imdb.com/title/tt1825683/",
+  "language": "English",
+  "country": "USA",
+  "directors": [
+    {
+      "firstName": "Ryan",
+      "middleName": "",
+      "lastName": "Coogler",
+      "dateOfBirth": "1986-05-23T00:00:00",
+      "placeOfBirth": "Oakland, California, USA",
+      "biography": "Ryan Coogler was born on May 23, 1986 in Oakland, California, USA as Ryan Kyle Coogler. He is a director and writer, known for Creed (2015), Fruitvale Station (2013) and Black Panther (2018)."
+    }
+  ],
+  "producers": [
+    {
+      "firstName": "Victoria",
+      "middleName": "",
+      "lastName": "Alonso",
+      "dateOfBirth": "1965-12-22T00:00:00",
+      "placeOfBirth": "Buenos Aires, Argentina",
+      "biography": "Victoria Alonso was born on December 22, 1965 in Buenos Aires, Argentina. She is a producer, known for Iron Man (2008), Kingdom of Heaven (2005) and Sordid Lives (2000)."
+    },
+    {
+      "firstName": "Jeffrey",
+      "middleName": "",
+      "lastName": "Chernov",
+      "dateOfBirth": "",
+      "placeOfBirth": "",
+      "biography": "Jeffrey Chernov began his career in Hollywood as an assistant director and unit production manager. After performing these jobs in such films as \"Body Heat,\" he moved on to production manager, working on films such as \"Escape from New York\" and \"The Thing.\" He changed professions once again, moving to vice president of production for Disney and Touchstone, and was involved in the smash hit \"Pretty Woman.\" He now serves as an executive producer, working on Disney/Touchstone films like \"Holy Man,\" \"Ten Things I Hate About You,\" and \"First Kid.\""
+    }
+  ],
+  "writers": [
+    {
+      "firstName": "Ryan",
+      "middleName": "",
+      "lastName": "Coogler",
+      "dateOfBirth": "1986-05-23T00:00:00",
+      "placeOfBirth": "Oakland, California, USA",
+      "biography": "Ryan Coogler was born on May 23, 1986 in Oakland, California, USA as Ryan Kyle Coogler. He is a director and writer, known for Creed (2015), Fruitvale Station (2013) and Black Panther (2018)."
+    },
+    {
+      "firstName": "Joe",
+      "middleName": "Robert",
+      "lastName": "Cole",
+      "dateOfBirth": "",
+      "placeOfBirth": "",
+      "biography": "Joe Robert Cole is a writer and producer, known for Black Panther (2018), American Crime Story (2016) and Revoc."
+    }
+  ],
+  "cast": [
+    {
+      "firstName": "Chadwick",
+      "middleName": "",
+      "lastName": "Boseman",
+      "dateOfBirth": "1977-11-29T00:00:00",
+      "placeOfBirth": "Anderson, South Carolina, USA",
+      "biography": "Chadwick Boseman is an American actor. He is known for his portrayal of T'Challa / Black Panther in the Marvel Cinematic Universe (since 2016), particularly in Black Panther (2018), and for his starring roles in as Jackie Robinson in 42 (2013), James Brown in Get on Up (2014), and Thurgood Marshall in Marshall (2017)."
+    },
+    {
+      "firstName": "Michael",
+      "middleName": "B.",
+      "lastName": "Jordan",
+      "dateOfBirth": "1987-02-09T00:00:00",
+      "placeOfBirth": "Santa Ana, California, USA",
+      "biography": "Michael B. Jordan, the middle of three children, was born in Santa Ana, California and raised in Newark, New Jersey. He is the son of Donna (Davis), a high school counselor, and Michael A. Jordan. His middle name, Bakari, means \"noble promise\" in Swahili. (He is not related to, or named after, basketball legend Michael Jordan.)"
+    },
+    {
+      "firstName": "Lupita",
+      "middleName": "",
+      "lastName": "Nyong'o",
+      "dateOfBirth": "1983-03-01T00:00:00",
+      "placeOfBirth": "Mexico City, Distrito Federal, Mexico",
+      "biography": "Lupita Amondi Nyong'o was born March 1, 1983 in Mexico City, Mexico, to Kenyan parents, Dorothy Ogada Buyu and Peter Anyang' Nyong'o. Her father, a senator, was then a visiting lecturer in political science. She was raised in Kenya. At age 16, her parents sent her back to Mexico for seven months to learn Spanish."
+    }
+  ]
+}
