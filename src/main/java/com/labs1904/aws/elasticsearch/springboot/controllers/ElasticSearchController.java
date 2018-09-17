@@ -1,6 +1,7 @@
 package com.labs1904.aws.elasticsearch.springboot.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.labs1904.aws.elasticsearch.springboot.constants.ElasticSearchConstants;
 import com.labs1904.aws.elasticsearch.springboot.handlers.AwsResponse;
 import com.labs1904.aws.elasticsearch.springboot.models.Movie;
 import com.labs1904.aws.elasticsearch.springboot.models.MovieQuery;
@@ -33,7 +34,7 @@ public class ElasticSearchController {
     @ResponseBody
     public ResponseEntity<String> getFromElasticSearch(@RequestBody final MovieQuery movieQuery) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                elasticSearchService.getMovies("movies", 0, 100, null, movieQuery));
+                elasticSearchService.getMovies(ElasticSearchConstants.MOVIES_INDEX, 0, 100, null, movieQuery));
     }
 
     /**
@@ -46,7 +47,7 @@ public class ElasticSearchController {
     @ResponseBody
     public ResponseEntity<String> getFromElasticSearchFuzzySearch(@RequestBody final MovieQuery movieQuery) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                elasticSearchService.getMoviesFuzzySearch("movies", 0, 100, null, movieQuery));
+                elasticSearchService.getMoviesFuzzySearch(ElasticSearchConstants.MOVIES_INDEX, 0, 100, null, movieQuery));
     }
 
     /**
@@ -67,7 +68,7 @@ public class ElasticSearchController {
         } catch (JsonProcessingException e) {
             LOGGER.error("Failed to create Movie.", e);
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create  " + title);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create  " + movie.getTitle());
     }
 
     /**
@@ -90,7 +91,7 @@ public class ElasticSearchController {
         } catch (JsonProcessingException e) {
             LOGGER.error("Failed to update Movie.", e);
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update  " + title);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update  " + movie.getTitle());
     }
 
     /**
