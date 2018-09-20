@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.labs1904.aws.elasticsearch.springboot.config.ConfigurationInfo;
 import com.labs1904.aws.elasticsearch.springboot.constants.ElasticSearchConstants;
+import com.labs1904.aws.elasticsearch.springboot.exceptions.IdNotFoundException;
 import com.labs1904.aws.elasticsearch.springboot.handlers.AwsResponse;
 import com.labs1904.aws.elasticsearch.springboot.handlers.ElasticSearchClientHandler;
 import com.labs1904.aws.elasticsearch.springboot.models.Movie;
@@ -155,7 +156,42 @@ public class ElasticSearchService {
             AwsResponse response = createDocument(ElasticSearchConstants.MOVIES_INDEX,
                     ElasticSearchConstants.MOVIES_DOCUMENT_TYPE,
                     json,
-                    Long.toString(movie.getId()));
+                    movie.getId().toString());
+            if (response != null && response.getHttpResponse().getStatusCode() == HttpStatus.OK.value()) {
+                LOGGER.info("Successfully created new movie with ID: {} and title: {}", movie.getId(), movie.getTitle());
+                return movie.getTitle();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Update the Movie in ElasticSearch
+     *
+     * @param movie The Movie
+     * @param id The ID of the Movie
+     * @return The response string
+     * @throws JsonProcessingException Throws JsonProcessingException when response cannot be parsed
+     */
+    public String updateMovie(final Long id, Movie movie) throws JsonProcessingException, IdNotFoundException {
+        final MovieQuery movieQuery = new MovieQuery();
+        movieQuery.setId(id);
+
+        //Search ElasticSearch to make sure that the given ID is valid
+        final String movieToUpdate = getMovies(ElasticSearchConstants.MOVIES_INDEX, 0, 100, null, movieQuery);
+        if (movieToUpdate == null || movieToUpdate.equals(ElasticSearchConstants.EMPTY_RESPONSE)){
+            throw new IdNotFoundException("Failed to find movie to update with id of " + id);
+        }
+
+        //If the ID does exist, then overwrite the existing object with the object provided in the update request
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String json = objectMapper.writeValueAsString(movie);
+        if (json != null) {
+            AwsResponse response = createDocument(ElasticSearchConstants.MOVIES_INDEX,
+                    ElasticSearchConstants.MOVIES_DOCUMENT_TYPE,
+                    json,
+                    movie.getId().toString());
             if (response != null && response.getHttpResponse().getStatusCode() == HttpStatus.OK.value()) {
                 LOGGER.info("Successfully created new movie with ID: {} and title: {}", movie.getId(), movie.getTitle());
                 return movie.getTitle();
@@ -244,7 +280,7 @@ public class ElasticSearchService {
      * @param array The JSONArray
      */
     private void createMovieQuery(final MovieQuery movieQuery, JSONArray array) {
-        if(movieQuery.getId() > 0){
+        if(movieQuery.getId() != null){
             buildElasticSearchMatchStatement("id", movieQuery.getId(), array);
         }
         if(StringUtils.checkNullOrEmpty(movieQuery.getTitle())){

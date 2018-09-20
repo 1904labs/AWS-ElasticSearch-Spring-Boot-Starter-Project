@@ -13,4 +13,5 @@ public class ElasticSearchConstants {
     public static final String SEARCH_API = "/_search";
     public static final String STATS_API = "/_stats";
 
+    public static final String EMPTY_RESPONSE = "{}";
 }

@@ -2,6 +2,7 @@ package com.labs1904.aws.elasticsearch.springboot.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.labs1904.aws.elasticsearch.springboot.constants.ElasticSearchConstants;
+import com.labs1904.aws.elasticsearch.springboot.exceptions.IdNotFoundException;
 import com.labs1904.aws.elasticsearch.springboot.handlers.AwsResponse;
 import com.labs1904.aws.elasticsearch.springboot.models.Movie;
 import com.labs1904.aws.elasticsearch.springboot.models.MovieQuery;
@@ -79,17 +80,18 @@ public class ElasticSearchController {
      */
     @PutMapping(value = "/update", produces = {MediaType.TEXT_PLAIN_VALUE})
     @ResponseBody
-    public ResponseEntity<String> updateElasticSearchObject(@RequestBody final Movie movie) {
+    public ResponseEntity<String> updateElasticSearchObject(@RequestBody final Movie movie,
+                                                            @RequestParam(value = "id", required = true) final Long id) {
         String title = null;
         try {
-            // For simplicity, since ElasticSearch fully overwrites the document, we will create a new document from the request
-            // and push to ElasticSearch which will overwrite the existing document
-            title = elasticSearchService.createNewMovie(movie);
+            title = elasticSearchService.updateMovie(id, movie);
             if (title != null) {
                 return ResponseEntity.status(HttpStatus.OK).body("Successfully updated " + title);
             }
         } catch (JsonProcessingException e) {
             LOGGER.error("Failed to update Movie.", e);
+        } catch (IdNotFoundException inf) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(inf.getMessage());
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update  " + movie.getTitle());
     }

@@ -3,7 +3,7 @@ package com.labs1904.aws.elasticsearch.springboot.models;
 import java.util.Set;
 
 public class Movie {
-    private long id;
+    private Long id;
     private String title;
     private long year;
     private Set<String> genre;
@@ -20,11 +20,11 @@ public class Movie {
     private Set<Person> writers;
     private Set<Person> cast;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
