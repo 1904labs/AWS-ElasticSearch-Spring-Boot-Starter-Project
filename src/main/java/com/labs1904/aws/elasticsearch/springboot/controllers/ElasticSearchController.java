@@ -111,7 +111,7 @@ public class ElasticSearchController {
                                                           @RequestParam("id") final String id) {
         AwsResponse response = elasticSearchService.deleteDocument(index, type, id);
         if (response != null && response.getHttpResponse().getStatusCode() == 200) {
-            return ResponseEntity.status(HttpStatus.OK).body(String.valueOf(response.getHttpResponse().getStatusCode()));
+            return ResponseEntity.status(HttpStatus.OK).body("Successfully deleted movie with ID of " + id);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting ElasticSearch document");
         }

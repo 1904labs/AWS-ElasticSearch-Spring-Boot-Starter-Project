@@ -157,7 +157,9 @@ public class ElasticSearchService {
                     ElasticSearchConstants.MOVIES_DOCUMENT_TYPE,
                     json,
                     movie.getId().toString());
-            if (response != null && response.getHttpResponse().getStatusCode() == HttpStatus.OK.value()) {
+            // Creating a new document not seen before results in a 201 status, where as overwriting a previous document results in a 200
+            if (response != null && (response.getHttpResponse().getStatusCode() == HttpStatus.CREATED.value()
+                || response.getHttpResponse().getStatusCode() == HttpStatus.OK.value())) {
                 LOGGER.info("Successfully created new movie with ID: {} and title: {}", movie.getId(), movie.getTitle());
                 return movie.getTitle();
             }
