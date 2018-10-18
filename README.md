@@ -1,4 +1,4 @@
-#AWS ElasticSearch
+# AWS ElasticSearch
 
 # Welcome
 This `skeleton` project was made to help developers use Amazon's ElasticSearch through the use of their Java SDK. The project comes with complete working example API endpoints, and queries. Let this be your one stop solution to implementing ES logic for your Java needs.
