@@ -1,25 +1,5 @@
 #AWS ElasticSearch
 
-TODO:
-- [ ] Initial ES configuration overview of minimum setup
-  - AWS Dashboard configuration
-  - IAM user and group creation
-  - Project level files needed to point and query AWS ES
-- [ ] Explain how AWS key chain method works.
-- [ ] Initial document creation
-  - Creates index and mapping if no other existing mapping
-- [ ] Building an AWS ES queries in Java
-  - Updating
-  - Deletion
-  - Search
-- [ ] Execute the Java made query to AWS ES
-- [ ] Handling AWS ES responses
-- [ ] Handling AWS ES errors
-- [ ] Maven Dependencies
-- [ ] Python
-  - Libraries
-  - Mapping and Indexing
-
 # Welcome
 This `skeleton` project was made to help developers use Amazon's ElasticSearch through the use of their Java SDK. The project comes with complete working example API endpoints, and queries. Let this be your one stop solution to implementing ES logic for your Java needs.
 
@@ -67,7 +47,7 @@ Enter your key values, save and close. You're done. =)
 
 **Notice: The _credentials_ file must NOT have a file extension.**
 
-`Windows` users, place the `Credentials` file in: `C:\Users\_your_user_profile`
+`Windows` users, place the `.aws/credentials` file in: `C:\Users\_your_user_profile`
 
 ## Configuration
 Testing of this application was done with the latest version of ElasticSearch available on AWS (6.2), however this project should work with all versions at least 5.0 or greater.
@@ -88,15 +68,15 @@ When creating your instance of ElasticSearch in AWS, be sure to select `Public A
 Before we dive down into how to use the API, you must understand `4` simple concepts of ES: `Indexing`, `Documents`, `Mapping` and `Fields`. If you already have ES knowledge, then go ahead and skip ahead to `The APIs` section.
 
 ### 1. Indexing
-Think of an index as a `type` of database that ES can quickly search/reference. An ES instance allows you to have more than 1 type, and requires you to have at least 1 declared. In our movie database example, our index is `movies`. One good practice is to use the plural tense as good naming convention. You will see why soon.
+Think of an index as a `table` in a database that ES can quickly search/reference. An ES instance allows you to have more than 1 type, and requires you to have at least 1 declared. In our movie database example, our index is `movies`. One good practice is to use the plural tense as good naming convention. You will see why soon.
 
 ### 2. Document
 What we store and retrieve from an ES instance are `Documents`. Think of them as a record on a database (the `index`). A document is made up of an `index` that it belongs to, a `mapping type`, and a `body` field. More precisely, a document is a `JSON` type of the record, where the index represents its `type` and the `mapping` its data. Clear as mud? Don't worry, everything will make sense with our movie database example.
 
-### Mapping
+### 3. Mapping
 This is how ES defines the data with given fields. It is the document's `data schema`. It tells ES how the data is structured. When creating a mapping, it needs an `index`, a `type`, and a `body` which is of JSON form. The `type` (as good convention) is the _single_ tense of its index. So in this case, it would be `movie`.
 
-### Fields
+### 4. Fields
 Fields are the individual _data points_ in the `Document`, and are defined by its `Type`. For example, the _title_ of a movie would be a field.
 
 ### Movie Database
@@ -150,11 +130,40 @@ Since your ES instance was empty at first, making this first call created 3 thin
 Go ahead and insert more movies into your ES. This will help us test later on. =)
 
 ### API 2: Update an Document (PUT)
+After we have data in our ElasticSearch Index, we can update it using the `update` API. For simplicity, the `update` API request body will fully replace the document in ElasticSearch.
+
+**Request**: `http:localhost:8081/elastic-search/update`
+
+**Response**: `Successfully updated _movie-title_`. Where movie title will be the title value in your JSON body.
+
 
 ### API 3: Search (POST)
+The request body for the `search` API can contain any field of the `Movie` object that you wish to search on, along with the full or partial matching value. 
+
+**Request**: `http:localhost:8081/elastic-search/search`
+
+**Response**: The full ElasticSearch Response Body, including the Movie you searched for if it was found.
+
 
 ### API 4: FuzzySearch (POST)
+The request body for the `fuzzySearch` API can contain any field of the `Movie` object that you wish to search on, along with a partial value. This endpoint is useful when searching incomplete words.
+
+**Request**: `http:localhost:8081/elastic-search/fuzzySearch`
+
+**Response**: The full ElasticSearch Response Body, including the Movie you searched for if it was found.
+
 
 ### API 5: Delete (DELETE)
+The `delete` API does exactly what it implies. This will delete the document from ElasticSearch. In the Request, provide the Index, Document Type, and ID. These parameters tell ElasticSearch where to find the document you wish to delete.
+
+**Request**: `http://localhost:8081/elastic-search/delete?index=movies&type=movie&id=1`
+
+**Response**: `Successfully deleted movie with ID of _id_` Where the `id` is the ID of the document you specified in the request.
+
 
 ### API 6: Statistics (GET)
+The `statistics` API provides in-depth statistics about your ElasticSearch index. For a complete description of what the response of this API returns, see this link to the [ElasticSearch documentation.](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html)
+
+**Request**: `http://localhost:8081/elastic-search/statistics?index=movies`
+
+**Response**: The Full ElasticSearch Response Body containing statistics of the requested index.
